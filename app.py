@@ -32,3 +32,13 @@ def chat():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+response = requests.post(API_URL, headers=headers, json=data)
+
+# 디버깅: 응답 상태 및 전체 텍스트 출력
+print("📡 응답 상태코드:", response.status_code)
+print("📡 응답 내용:", response.text)
+
+response_data = response.json()
+reply = response_data["choices"][0]["message"]["content"]
+return jsonify({"reply": reply})
