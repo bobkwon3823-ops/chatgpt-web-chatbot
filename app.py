@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-API_KEY = "your-openrouter-api-key"  # 여기에 본인의 API 키 입력
+API_KEY = "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"  # 여기에 본인의 API 키 입력
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 @app.route("/")
