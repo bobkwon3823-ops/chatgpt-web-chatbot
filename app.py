@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-API_KEY = "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"  # 여기에 본인의 API 키 입력
+API_KEY = "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"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 @app.route("/")
@@ -26,19 +26,19 @@ def chat():
     }
 
     response = requests.post(API_URL, headers=headers, json=data)
-    reply = response.json()["choices"][0]["message"]["content"]
+
+    # 응답 디버깅
+    print("📡 응답 상태코드:", response.status_code)
+    print("📡 응답 내용:", response.text)
+
+    try:
+        response_data = response.json()
+        reply = response_data["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, ValueError) as e:
+        reply = "❌ API 응답 오류가 발생했습니다."
+
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-response = requests.post(API_URL, headers=headers, json=data)
-
-# 디버깅: 응답 상태 및 전체 텍스트 출력
-print("📡 응답 상태코드:", response.status_code)
-print("📡 응답 내용:", response.text)
-
-response_data = response.json()
-reply = response_data["choices"][0]["message"]["content"]
-return jsonify({"reply": reply})
