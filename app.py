@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import requests
-
+import os
 app = Flask(__name__)
 
 API_KEY = "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"  # 여기에 본인의 OpenRouter API 키 입력
