@@ -19,7 +19,7 @@ def chat():
         "Content-Type": "application/json"
     }
     data = {
-        "model": "openai/gpt-3.5-turbo",
+        "model": "mistralai/mixtral-8x7b",  # 무료 모델로 시도
         "messages": [
             {"role": "user", "content": user_input}
         ]
@@ -27,7 +27,7 @@ def chat():
 
     response = requests.post(API_URL, headers=headers, json=data)
 
-    # 응답 디버깅
+    # 🔽 응답 확인용 로그
     print("📡 응답 상태코드:", response.status_code)
     print("📡 응답 내용:", response.text)
 
@@ -35,7 +35,7 @@ def chat():
         response_data = response.json()
         reply = response_data["choices"][0]["message"]["content"]
     except (KeyError, IndexError, ValueError) as e:
-        reply = "❌ API 응답 오류가 발생했습니다."
+        reply = f"❌ API 응답 오류가 발생했습니다: {e}"
 
     return jsonify({"reply": reply})
 
