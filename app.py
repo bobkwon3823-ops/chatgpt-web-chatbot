@@ -13,29 +13,34 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_input = request.json["message"]
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
-    }
-    data = {
-        "model": "mistralai/mixtral-8x7b",  # 무료 모델로 시도
-        "messages": [
-            {"role": "user", "content": user_input}
-        ]
-    }
-
-    response = requests.post(API_URL, headers=headers, json=data)
-
-    # 🔽 응답 확인용 로그
-    print("📡 응답 상태코드:", response.status_code)
-    print("📡 응답 내용:", response.text)
+    print("✅ [서버 진입] /chat 요청 받음")
 
     try:
+        user_input = request.json["message"]
+        print("📨 사용자 메시지:", user_input)
+
+        headers = {
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        data = {
+            "model": "mistralai/mixtral-8x7b",  # 무료 모델
+            "messages": [
+                {"role": "user", "content": user_input}
+            ]
+        }
+
+        response = requests.post(API_URL, headers=headers, json=data)
+        print("📡 응답 상태코드:", response.status_code)
+        print("📡 응답 내용:", response.text)
+
         response_data = response.json()
         reply = response_data["choices"][0]["message"]["content"]
-    except (KeyError, IndexError, ValueError) as e:
-        reply = f"❌ API 응답 오류가 발생했습니다: {e}"
+
+    except Exception as e:
+        print("❌ 예외 발생:", str(e))
+        reply = f"❌ API 응답 오류: {str(e)}"
 
     return jsonify({"reply": reply})
 
