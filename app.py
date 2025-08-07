@@ -25,7 +25,7 @@ def chat():
         }
 
         data = {
-            "model": "mistralai/mixtral-8x7b",  # 무료 모델
+            "model": "mistralai/mixtral-8x7b",
             "messages": [
                 {"role": "user", "content": user_input}
             ]
@@ -40,10 +40,6 @@ def chat():
 
     except Exception as e:
         print("❌ 예외 발생:", str(e))
-        reply = f"❌ API 응답 오류: {str(e)}"
+        return jsonify({"reply": f"❌ 오류가 발생했습니다: {str(e)}"})
 
     return jsonify({"reply": reply})
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
