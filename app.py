@@ -25,7 +25,7 @@ def chat():
         }
 
         data = {
-            "model": "mistralai/mixtral-8x7b",
+            "model": "mistralai/mixtral-8x7b",  # 안정적인 무료 모델
             "messages": [
                 {"role": "user", "content": user_input}
             ]
@@ -36,11 +36,15 @@ def chat():
         print("📡 응답 내용:", response.text)
 
         response_data = response.json()
-        reply = response_data["choices"][0]["message"]["content"]
+
+        # 예외 없이 진행됐을 때만 'choices' 접근
+        if "choices" in response_data:
+            reply = response_data["choices"][0]["message"]["content"]
+        else:
+            reply = f"❌ API 응답 오류: {response_data}"
 
     except Exception as e:
         print("❌ 예외 발생:", str(e))
-        print("❗ 전체 응답:", response.text)  # ← 추가
-        return jsonify({"reply": f"❌ API 응답 오류: {str(e)}"})
+        reply = f"❌ 서버 오류 발생: {str(e)}"
 
     return jsonify({"reply": reply})
