@@ -1,11 +1,15 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import requests
 import os
 
 app = Flask(__name__)
 
+# ✅ 환경변수에서 API 키 불러오기
 API_KEY = os.getenv("API_KEY")
+
+# ✅ OpenRouter API 설정
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
+MODEL_NAME = "mistralai/mixtral-8x7b"  # 또는 "openai/gpt-3.5-turbo"
 
 @app.route("/")
 def home():
@@ -13,41 +17,35 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
+    user_input = request.json.get("message", "")
+
+    # ✅ API 키가 없을 경우 에러 메시지
+    if not API_KEY:
+        return jsonify({"reply": "❌ 오류: API 키가 설정되지 않았습니다."}), 500
+
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": MODEL_NAME,
+        "messages": [
+            {"role": "user", "content": user_input}
+        ]
+    }
+
     try:
-        user_input = request.json["message"]
-        print("📨 사용자 메시지:", user_input)
-
-        headers = {
-            "Authorization": f"Bearer {API_KEY}",
-            "Content-Type": "application/json"
-        }
-
-        data = {
-            "model": "mistralai/mixtral-8x7b",  # 무료/안정적인 모델로 변경
-            "messages": [
-                {"role": "user", "content": user_input}
-            ]
-        }
-
+        # ✅ API 요청
         response = requests.post(API_URL, headers=headers, json=data)
-        print("📡 응답 상태코드:", response.status_code)
-        print("📡 응답 내용:", response.text)
+
+        # ✅ 디버깅용 로그 출력 (Render 로그에서 확인 가능)
+        print("✅ [디버깅] 응답 코드:", response.status_code)
+        print("✅ [디버깅] 응답 내용:", response.text)
+
+        if response.status_code != 200:
+            return jsonify({"reply": f"❌ API 응답 오류: {response.json()}"})
 
         response_data = response.json()
 
-        # 여기에 핵심 변경 사항 있음
-        if "choices" in response_data:
-            reply = response_data["choices"][0]["message"]["content"]
-        else:
-            # API 응답을 직접 사용자에게 보여줌
-            reply = f"❌ API 응답 오류: {response_data}"
-
-    except Exception as e:
-        print("❌ 예외 발생:", str(e))
-        reply = f"❌ 서버 오류 발생: {str(e)}"
-
-    return jsonify({"reply": reply})
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+        # ✅ 'choices'
