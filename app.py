@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-API_KEY = "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"
+API_KEY = "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"  # OpenRouter에서 발급받은 키
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 @app.route("/")
@@ -13,8 +13,6 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    print("✅ [서버 진입] /chat 요청 받음")
-
     try:
         user_input = request.json["message"]
         print("📨 사용자 메시지:", user_input)
@@ -25,7 +23,7 @@ def chat():
         }
 
         data = {
-            "model": "mistralai/mixtral-8x7b",  # 안정적인 무료 모델
+            "model": "mistralai/mixtral-8x7b",  # 무료/안정적인 모델로 변경
             "messages": [
                 {"role": "user", "content": user_input}
             ]
@@ -37,10 +35,11 @@ def chat():
 
         response_data = response.json()
 
-        # 예외 없이 진행됐을 때만 'choices' 접근
+        # 여기에 핵심 변경 사항 있음
         if "choices" in response_data:
             reply = response_data["choices"][0]["message"]["content"]
         else:
+            # API 응답을 직접 사용자에게 보여줌
             reply = f"❌ API 응답 오류: {response_data}"
 
     except Exception as e:
@@ -48,3 +47,7 @@ def chat():
         reply = f"❌ 서버 오류 발생: {str(e)}"
 
     return jsonify({"reply": reply})
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
