@@ -40,6 +40,7 @@ def chat():
 
     except Exception as e:
         print("❌ 예외 발생:", str(e))
-        return jsonify({"reply": f"❌ 오류가 발생했습니다: {str(e)}"})
+        print("❗ 전체 응답:", response.text)  # ← 추가
+        return jsonify({"reply": f"❌ API 응답 오류: {str(e)}"})
 
     return jsonify({"reply": reply})
